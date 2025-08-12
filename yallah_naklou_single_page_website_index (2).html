@@ -564,13 +564,15 @@
     function updateCartUI() {
       const count = cart.reduce((total, item) => total + item.quantity, 0);
       const countEl = $('#cartCount');
-      if (count > 0) {
-        countEl.textContent = count;
-        countEl.classList.remove('hidden');
-        countEl.classList.add('cart-bounce');
-        setTimeout(() => countEl.classList.remove('cart-bounce'), 500);
-      } else {
-        countEl.classList.add('hidden');
+      if (countEl) {
+        if (count > 0) {
+          countEl.textContent = count;
+          countEl.classList.remove('hidden');
+          countEl.classList.add('cart-bounce');
+          setTimeout(() => countEl.classList.remove('cart-bounce'), 500);
+        } else {
+          countEl.classList.add('hidden');
+        }
       }
     }
 
