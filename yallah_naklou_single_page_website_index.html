@@ -4,9 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Yallah Naklou – Restaurant à Fès</title>
-  <meta name="description" content="Yallah Naklou – French Tacos, Grillades, Burgers, Tex‑Mex. Deux adresses à Fès. Livraison via Glovo, téléphone ou WhatsApp. Halal, terrasse, ouvert tard." />
+  <meta name="description" content="Yallah Naklou – French Tacos, Grillades, Burgers, Tex‑Mex. Deux adresses à Fès. Livraison via téléphone ou WhatsApp. Halal, terrasse, ouvert tard." />
   <meta property="og:title" content="Yallah Naklou – Restaurant à Fès" />
-  <meta property="og:description" content="Deux adresses à Fès. Livraison via Glovo, téléphone ou WhatsApp. Halal, terrasse, ouvert tard." />
+  <meta property="og:description" content="Deux adresses à Fès. Livraison via téléphone ou WhatsApp. Halal, terrasse, ouvert tard." />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="fr_MA" />
   <link rel="icon" href="/favicon.ico" />
@@ -236,7 +236,6 @@
           maps_url: "https://maps.app.goo.gl/FhDt4CD7o2kck4Po8",
           phone: "+212535931063",
           whatsapp: "https://wa.me/212535931063",
-          glovo_url: "https://www.google.com/url?url=https%3A%2F%2Fglovoapp.com%2Fma%2Ffr%2Ffes%2Fyallah-naklou-fes%3Futm_source%3Dgoogle%26utm_medium%3Dorganic%26utm_campaign%3Dgoogle_reserve_place_order_action&sa=t&rct=j&source=maps&usg=AOvVaw06hGcFfUIqWl5_5dJwzbVU&ved=1i%3A27%2Ct%3A104095%2Ce%3A16%2Cp%3Avl-baMvLGfOakdUP1vqhoAM%3A175",
           hours: {
             lundi: "12:00–00:30", mardi: "12:00–00:30", mercredi: "12:00–00:30", jeudi: "12:00–00:30", vendredi: "16:30–00:30", samedi: "12:00–01:00", dimanche: "12:00–01:00"
           }
@@ -248,7 +247,6 @@
           maps_url: "https://maps.app.goo.gl/Tfa2eW89qhyC5tWS9",
           phone: "+212535960460",
           whatsapp: "https://wa.me/212535960460",
-          glovo_url: "https://www.google.com/url?url=https%3A%2F%2Fglovoapp.com%2Fma%2Ffr%2Ffes%2Fyallah-naklou2-fessma%3Futm_source%3Dgoogle%26utm_medium%3Dorganic%26utm_campaign%3Dgoogle_reserve_place_order_action&sa=t&rct=j&source=maps&usg=AOvVaw1pDzvLK9uQ0cfpZb0dxNtp&ved=1i%3A26%2Ct%3A104095%2Ce%3A15%2Cp%3Avl-baMvLGfOakdUP1vqhoAM%3A238",
           hours: {
             lundi: "13:00–00:00", mardi: "13:00–00:00", mercredi: "13:00–00:00", jeudi: "13:00–00:00", vendredi: "16:00–00:00", samedi: "13:00–00:00", dimanche: "13:00–00:00"
           }
@@ -272,7 +270,6 @@
       payments: ["cash","cash_on_delivery","credit_cards","debit_cards","nfc_mobile"],
       ui: {
         fr: { 
-          order_glovo:"Commander sur Glovo", 
           call:"Appeler", 
           whatsapp:"WhatsApp", 
           see_menu:"Voir le menu", 
@@ -306,7 +303,6 @@
           gratin:"Gratin"
         },
         en: { 
-          order_glovo:"Order on Glovo", 
           call:"Call", 
           whatsapp:"WhatsApp", 
           see_menu:"View Menu", 
@@ -340,7 +336,6 @@
           gratin:"Gratin"
         },
         ar: { 
-          order_glovo:"اطلب عبر غلوفو", 
           call:"اتصال", 
           whatsapp:"واتساب", 
           see_menu:"عرض القائمة", 
@@ -1001,7 +996,6 @@
           sameAs: [ DATA.social.facebook, DATA.social.instagram ],
           hasMap: loc.maps_url,
           openingHoursSpecification: spec,
-          potentialAction: { "@type":"OrderAction", target: { "@type":"EntryPoint", urlTemplate: loc.glovo_url.includes('glovoapp.com') ? loc.glovo_url : '' }},
           paymentAccepted: ["Cash","Cash on Delivery","Credit Card","Debit Card","NFC Mobile"],
           priceRange: DATA.menu.currency
         };
