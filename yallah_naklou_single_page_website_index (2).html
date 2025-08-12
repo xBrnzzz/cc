@@ -4,14 +4,26 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Yallah Naklou – Restaurant à Fès</title>
-  <meta name="description" content="Yallah Naklou – French Tacos, Grillades, Burgers, Tex‑Mex. Deux adresses à Fès. Livraison via Glovo, téléphone ou WhatsApp. Halal, terrasse, ouvert tard." />
+  <meta name="description" content="Yallah Naklou – French Tacos, Grillades, Burgers, Tex‑Mex. Deux adresses à Fès. Commande par téléphone ou WhatsApp. Halal, terrasse, ouvert tard." />
   <meta property="og:title" content="Yallah Naklou – Restaurant à Fès" />
-  <meta property="og:description" content="Deux adresses à Fès. Livraison via Glovo, téléphone ou WhatsApp. Halal, terrasse, ouvert tard." />
+  <meta property="og:description" content="Deux adresses à Fès. Commande par téléphone ou WhatsApp. Halal, terrasse, ouvert tard." />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="fr_MA" />
   <link rel="icon" href="/favicon.ico" />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* Color scheme variables */
+    :root {
+      --primary-gold: #FBC73A;
+      --primary-gold-dark: #f4c430;
+      --primary-gold-light: #fde68a;
+      --accent-orange: #fb923c;
+      --accent-red: #ef4444;
+      --text-brown: #92400e;
+      --bg-cream: #fffbeb;
+      --bg-light: #fef3c7;
+    }
+    
     /* Smooth scroll */
     html { scroll-behavior: smooth; }
     /* Hide scrollbars for horizontal carousels */
@@ -20,14 +32,52 @@
     /* Cart animations */
     .cart-animate { transition: all 0.3s ease; }
     .cart-bounce { animation: bounce 0.5s ease; }
+    .success-flash { animation: successFlash 1s ease; }
+    .delete-flash { animation: deleteFlash 1s ease; }
+    
     @keyframes bounce {
       0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
       40% { transform: translateY(-10px); }
       60% { transform: translateY(-5px); }
     }
+    
+    @keyframes successFlash {
+      0% { background-color: rgb(34 197 94); color: white; transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { background-color: #FBC73A; color: inherit; transform: scale(1); }
+    }
+    
+    @keyframes deleteFlash {
+      0% { background-color: rgb(239 68 68); color: white; transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { background-color: transparent; color: inherit; transform: scale(1); }
+    }
+    
+    /* Notification styles */
+    .notification {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: white;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border-left: 4px solid #10b981;
+      z-index: 50;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification.error {
+      border-left-color: #ef4444;
+    }
   </style>
 </head>
-<body class="bg-[#FCFCFB] text-slate-800">
+<body class="bg-gradient-to-br from-[#fffbeb] to-[#fef3c7] text-slate-800">
   <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:top-2 focus:left-2 bg-black text-white px-3 py-2 rounded">Skip to content</a>
 
   <!-- Sticky Mobile Order Bar -->
@@ -43,8 +93,12 @@
   <header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-slate-200">
     <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
       <div class="flex items-center gap-3">
-        <!-- Replace src with your real logo asset -->
-        <img src="logo.png" alt="Yallah Naklou" class="h-10 w-10 rounded-lg ring-1 ring-slate-200 object-contain" onerror="this.style.display='none'"/>
+        <!-- Logo SVG -->
+        <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-[#FBC73A] to-[#f4c430] flex items-center justify-center ring-1 ring-amber-300">
+          <svg viewBox="0 0 24 24" class="h-6 w-6 text-amber-800" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+          </svg>
+        </div>
         <div class="leading-tight">
           <h1 class="text-xl font-extrabold tracking-tight">Yallah Naklou</h1>
           <p id="taglineSmall" class="text-xs text-slate-500"></p>
@@ -91,8 +145,33 @@
         </div>
       </div>
       <div class="relative">
-        <div class="aspect-[4/3] rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 ring-1 ring-amber-300 flex items-center justify-center text-amber-800 font-semibold">
-          <span>🍔 🌮 🍟</span>
+        <div class="aspect-[4/3] rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 ring-1 ring-amber-300 overflow-hidden">
+          <div class="grid grid-cols-2 h-full gap-2 p-4">
+            <div class="bg-white rounded-xl flex items-center justify-center">
+              <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=200&h=200&fit=crop&crop=center" 
+                   alt="French Tacos" class="w-full h-full object-cover rounded-xl" 
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+              <div class="hidden items-center justify-center text-4xl" style="display: none;">🌮</div>
+            </div>
+            <div class="bg-white rounded-xl flex items-center justify-center">
+              <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=200&h=200&fit=crop&crop=center" 
+                   alt="Burger" class="w-full h-full object-cover rounded-xl"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+              <div class="hidden items-center justify-center text-4xl" style="display: none;">🍔</div>
+            </div>
+            <div class="bg-white rounded-xl flex items-center justify-center">
+              <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&h=200&fit=crop&crop=center" 
+                   alt="Salade" class="w-full h-full object-cover rounded-xl"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+              <div class="hidden items-center justify-center text-4xl" style="display: none;">🥗</div>
+            </div>
+            <div class="bg-white rounded-xl flex items-center justify-center">
+              <img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=200&h=200&fit=crop&crop=center" 
+                   alt="Frites" class="w-full h-full object-cover rounded-xl"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+              <div class="hidden items-center justify-center text-4xl" style="display: none;">🍟</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -218,6 +297,9 @@
     </div>
   </dialog>
 
+  <!-- Notification Container -->
+  <div id="notifications"></div>
+
   <script>
     // ====== DATA (edit to update content) ======
     const DATA = {
@@ -236,7 +318,6 @@
           maps_url: "https://maps.app.goo.gl/FhDt4CD7o2kck4Po8",
           phone: "+212535931063",
           whatsapp: "https://wa.me/212535931063",
-          glovo_url: "https://www.google.com/url?url=https%3A%2F%2Fglovoapp.com%2Fma%2Ffr%2Ffes%2Fyallah-naklou-fes%3Futm_source%3Dgoogle%26utm_medium%3Dorganic%26utm_campaign%3Dgoogle_reserve_place_order_action&sa=t&rct=j&source=maps&usg=AOvVaw06hGcFfUIqWl5_5dJwzbVU&ved=1i%3A27%2Ct%3A104095%2Ce%3A16%2Cp%3Avl-baMvLGfOakdUP1vqhoAM%3A175",
           hours: {
             lundi: "12:00–00:30", mardi: "12:00–00:30", mercredi: "12:00–00:30", jeudi: "12:00–00:30", vendredi: "16:30–00:30", samedi: "12:00–01:00", dimanche: "12:00–01:00"
           }
@@ -248,7 +329,6 @@
           maps_url: "https://maps.app.goo.gl/Tfa2eW89qhyC5tWS9",
           phone: "+212535960460",
           whatsapp: "https://wa.me/212535960460",
-          glovo_url: "https://www.google.com/url?url=https%3A%2F%2Fglovoapp.com%2Fma%2Ffr%2Ffes%2Fyallah-naklou2-fessma%3Futm_source%3Dgoogle%26utm_medium%3Dorganic%26utm_campaign%3Dgoogle_reserve_place_order_action&sa=t&rct=j&source=maps&usg=AOvVaw1pDzvLK9uQ0cfpZb0dxNtp&ved=1i%3A26%2Ct%3A104095%2Ce%3A15%2Cp%3Avl-baMvLGfOakdUP1vqhoAM%3A238",
           hours: {
             lundi: "13:00–00:00", mardi: "13:00–00:00", mercredi: "13:00–00:00", jeudi: "13:00–00:00", vendredi: "16:00–00:00", samedi: "13:00–00:00", dimanche: "13:00–00:00"
           }
@@ -272,11 +352,11 @@
       payments: ["cash","cash_on_delivery","credit_cards","debit_cards","nfc_mobile"],
       ui: {
         fr: { 
-          order_glovo:"Commander sur Glovo", 
+          order_online:"Ajouter au panier", 
           call:"Appeler", 
           whatsapp:"WhatsApp", 
           see_menu:"Voir le menu", 
-          directions:"Itinéraire", 
+          directions:"Localisation", 
           hours:"Horaires", 
           popular:"Populaire", 
           halal:"Halal", 
@@ -306,7 +386,7 @@
           gratin:"Gratin"
         },
         en: { 
-          order_glovo:"Order on Glovo", 
+          order_online:"Add to cart", 
           call:"Call", 
           whatsapp:"WhatsApp", 
           see_menu:"View Menu", 
@@ -340,7 +420,7 @@
           gratin:"Gratin"
         },
         ar: { 
-          order_glovo:"اطلب عبر غلوفو", 
+          order_online:"أضف للسلة", 
           call:"اتصال", 
           whatsapp:"واتساب", 
           see_menu:"عرض القائمة", 
@@ -543,6 +623,30 @@
       return `${section.name}-${item.name}-${JSON.stringify(item.selectedOptions || {})}`;
     }
 
+    // ====== Notification System ======
+    function showNotification(message, isError = false) {
+      const container = $('#notifications');
+      const notification = document.createElement('div');
+      notification.className = `notification ${isError ? 'error' : ''}`;
+      notification.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span class="text-lg">${isError ? '❌' : '✅'}</span>
+          <span class="font-medium">${message}</span>
+        </div>
+      `;
+      
+      container.appendChild(notification);
+      
+      // Show notification
+      setTimeout(() => notification.classList.add('show'), 100);
+      
+      // Auto hide after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => container.removeChild(notification), 300);
+      }, 3000);
+    }
+
     // ====== Cart Functions ======
     function openCart() {
       renderCart();
@@ -558,13 +662,16 @@
         cart = [];
         saveCart();
         renderCart();
+        showNotification('Panier vidé avec succès!');
       }
     }
 
     function removeFromCart(index) {
+      const itemName = cart[index].name;
       cart.splice(index, 1);
       saveCart();
       renderCart();
+      showNotification(`${itemName} supprimé du panier!`);
     }
 
     function updateCartQuantity(index, newQuantity) {
@@ -836,17 +943,8 @@
       saveCart();
       closeAddToCart();
       
-      // Show feedback
-      const btn = $('[data-i18n="add_to_cart"]');
-      if (btn) {
-        const originalText = btn.textContent;
-        btn.textContent = '✓ Ajouté!';
-        btn.classList.add('bg-green-500');
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.classList.remove('bg-green-500');
-        }, 1000);
-      }
+      // Show notification
+      showNotification(`${currentItem.name} ajouté au panier avec succès!`);
     }
 
     // ====== Render Hero / Popular / Menu / Locations ======
@@ -865,14 +963,33 @@
       const tacos = DATA.menu.sections.find(s => s.name.toLowerCase().includes('tacos'));
       if(!tacos) return;
       const items = tacos.items.filter(i => i.popular || ['Poulet','Mixte (2 viandes au choix)'].includes(i.name)).slice(0,6);
+      
+      // Food images for popular items
+      const foodImages = {
+        'Poulet': 'https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=300&h=200&fit=crop&crop=center',
+        'Mixte (2 viandes au choix)': 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300&h=200&fit=crop&crop=center',
+        'Viande hachée': 'https://images.unsplash.com/photo-1551782450-17144efb9c50?w=300&h=200&fit=crop&crop=center',
+        'Nuggets': 'https://images.unsplash.com/photo-1562967914-608f82629710?w=300&h=200&fit=crop&crop=center',
+        'Merguez': 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=300&h=200&fit=crop&crop=center',
+        'Cordon bleu': 'https://images.unsplash.com/photo-1606755962773-d324e2d12165?w=300&h=200&fit=crop&crop=center'
+      };
+      
       for(const it of items){
         const card = document.createElement('div');
-        card.className = 'min-w-[220px] border bg-white rounded-2xl p-4';
+        card.className = 'min-w-[220px] border bg-white rounded-2xl overflow-hidden';
+        const imageUrl = foodImages[it.name] || foodImages['Poulet']; // fallback to chicken
         card.innerHTML = `
-          <div class="text-sm text-slate-500 mb-1">French Tacos</div>
-          <div class="font-semibold">${it.name}</div>
-          <div class="mt-2 flex gap-2 flex-wrap text-xs">${Object.entries(it.prices||{}).map(([k,v])=>`<span class='px-2 py-1 bg-slate-100 rounded-full border'>${k}: ${money(v)}</span>`).join('')}</div>
-          <button class='mt-3 px-3 py-1.5 rounded-lg bg-[#FBC73A] text-sm font-semibold' onclick='openAddToCart(${JSON.stringify(it).replace(/'/g, "\\'")}, ${JSON.stringify(tacos).replace(/'/g, "\\'")})' data-i18n='add_to_cart'>${t('add_to_cart')}</button>
+          <div class="aspect-[4/3] bg-gradient-to-br from-amber-100 to-amber-200">
+            <img src="${imageUrl}" alt="${it.name}" class="w-full h-full object-cover" 
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+            <div class="hidden w-full h-full items-center justify-center text-4xl" style="display: none;">🌮</div>
+          </div>
+          <div class="p-4">
+            <div class="text-sm text-slate-500 mb-1">French Tacos</div>
+            <div class="font-semibold">${it.name}</div>
+            <div class="mt-2 flex gap-2 flex-wrap text-xs">${Object.entries(it.prices||{}).map(([k,v])=>`<span class='px-2 py-1 bg-slate-100 rounded-full border'>${k}: ${money(v)}</span>`).join('')}</div>
+            <button class='mt-3 w-full px-3 py-1.5 rounded-lg bg-[#FBC73A] text-sm font-semibold hover:bg-[#f4c430] transition-colors' onclick='openAddToCart(${JSON.stringify(it).replace(/'/g, "\\'")}, ${JSON.stringify(tacos).replace(/'/g, "\\'")})' data-i18n='add_to_cart'>${t('add_to_cart')}</button>
+          </div>
         `;
         wrap.appendChild(card);
       }
@@ -944,12 +1061,8 @@
       const ctas = document.createElement('div');
       ctas.className = 'mt-3 flex gap-2';
       
-      // Create add to cart button
-      const addBtn = document.createElement('button');
-      addBtn.className = 'px-3 py-1.5 rounded-lg bg-[#FBC73A] text-sm font-semibold';
-      addBtn.textContent = t('add_to_cart');
-      addBtn.onclick = () => openAddToCart(item, section);
-      ctas.appendChild(addBtn);
+      // Note: Cart buttons removed from detailed menu as per requirements
+      // Items can only be added from the popular section
       
       card.append(title, desc, price, ctas);
       return card;
@@ -1001,7 +1114,6 @@
           sameAs: [ DATA.social.facebook, DATA.social.instagram ],
           hasMap: loc.maps_url,
           openingHoursSpecification: spec,
-          potentialAction: { "@type":"OrderAction", target: { "@type":"EntryPoint", urlTemplate: loc.glovo_url.includes('glovoapp.com') ? loc.glovo_url : '' }},
           paymentAccepted: ["Cash","Cash on Delivery","Credit Card","Debit Card","NFC Mobile"],
           priceRange: DATA.menu.currency
         };
