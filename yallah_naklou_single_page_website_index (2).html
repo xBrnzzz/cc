@@ -25,6 +25,30 @@
       40% { transform: translateY(-10px); }
       60% { transform: translateY(-5px); }
     }
+    
+    /* Notification styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+    }
+    .notification.show {
+      transform: translateX(0);
+    }
+    .notification.success {
+      background-color: #10b981;
+    }
+    .notification.danger {
+      background-color: #ef4444;
+    }
   </style>
 </head>
 <body class="bg-[#FCFCFB] text-slate-800">
@@ -76,6 +100,7 @@
         <p id="tagline" class="mt-3 text-lg text-slate-600"></p>
         <div class="mt-6 flex flex-wrap items-center gap-3">
           <button class="px-4 py-2 rounded-xl bg-[#FBC73A] font-semibold" onclick="openCart()" data-i18n="view_cart">Voir panier</button>
+          <a class="px-4 py-2 rounded-xl bg-orange-500 text-white font-semibold" href="https://www.google.com/url?url=https%3A%2F%2Fglovoapp.com%2Fma%2Ffr%2Ffes%2Fyallah-naklou-fes%3Futm_source%3Dgoogle%26utm_medium%3Dorganic%26utm_campaign%3Dgoogle_reserve_place_order_action" target="_blank" rel="noopener" data-i18n="order_glovo">Commander sur Glovo</a>
           <a class="px-4 py-2 rounded-xl bg-slate-900 text-white" href="tel:+212535931063" data-i18n="call">Appeler</a>
           <a class="px-4 py-2 rounded-xl bg-emerald-600 text-white" href="https://wa.me/212535931063">WhatsApp</a>
         </div>
@@ -91,8 +116,14 @@
         </div>
       </div>
       <div class="relative">
-        <div class="aspect-[4/3] rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 ring-1 ring-amber-300 flex items-center justify-center text-amber-800 font-semibold">
-          <span>🍔 🌮 🍟</span>
+        <div class="aspect-[4/3] rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 ring-1 ring-amber-300 flex items-center justify-center overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+               alt="French Tacos Yallah Naklou" 
+               class="w-full h-full object-cover"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+          <div class="absolute inset-0 bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center text-amber-800 font-semibold text-2xl" style="display: none;">
+            🍔 🌮 🍟
+          </div>
         </div>
       </div>
     </div>
@@ -138,6 +169,10 @@
             <a class="px-4 py-3 rounded-xl bg-emerald-600 text-white text-center w-full" href="https://wa.me/212535931063">WhatsApp L1</a>
             <a class="px-4 py-3 rounded-xl bg-emerald-600 text-white text-center w-full" href="https://wa.me/212535960460">WhatsApp L2</a>
           </div>
+        </div>
+        <div class="mt-4 grid md:grid-cols-2 gap-3">
+          <a class="px-4 py-3 rounded-xl bg-orange-500 text-white text-center font-semibold" href="https://www.google.com/url?url=https%3A%2F%2Fglovoapp.com%2Fma%2Ffr%2Ffes%2Fyallah-naklou-fes%3Futm_source%3Dgoogle%26utm_medium%3Dorganic%26utm_campaign%3Dgoogle_reserve_place_order_action" target="_blank" rel="noopener">Commander sur Glovo L1</a>
+          <a class="px-4 py-3 rounded-xl bg-orange-500 text-white text-center font-semibold" href="https://www.google.com/url?url=https%3A%2F%2Fglovoapp.com%2Fma%2Ffr%2Ffes%2Fyallah-naklou2-fessma%3Futm_source%3Dgoogle%26utm_medium%3Dorganic%26utm_campaign%3Dgoogle_reserve_place_order_action" target="_blank" rel="noopener">Commander sur Glovo L2</a>
         </div>
         <div class="mt-6 flex gap-3">
           <a class="px-4 py-2 rounded-xl bg-[#FBC73A] font-semibold" href="https://web.facebook.com/YallahNaklou" target="_blank" rel="noopener">Facebook</a>
@@ -276,7 +311,7 @@
           call:"Appeler", 
           whatsapp:"WhatsApp", 
           see_menu:"Voir le menu", 
-          directions:"Itinéraire", 
+          directions:"Localisation", 
           hours:"Horaires", 
           popular:"Populaire", 
           halal:"Halal", 
@@ -565,6 +600,7 @@
       cart.splice(index, 1);
       saveCart();
       renderCart();
+      showNotification('✓ Supprimé avec succès!', 'danger');
     }
 
     function updateCartQuantity(index, newQuantity) {
@@ -836,17 +872,30 @@
       saveCart();
       closeAddToCart();
       
-      // Show feedback
-      const btn = $('[data-i18n="add_to_cart"]');
-      if (btn) {
-        const originalText = btn.textContent;
-        btn.textContent = '✓ Ajouté!';
-        btn.classList.add('bg-green-500');
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.classList.remove('bg-green-500');
-        }, 1000);
-      }
+      // Show success notification
+      showNotification('✓ Ajouté avec succès!', 'success');
+    }
+
+    // ====== Notification System ======
+    function showNotification(message, type = 'success') {
+      // Remove any existing notifications
+      const existing = $('.notification');
+      if (existing) existing.remove();
+      
+      // Create new notification
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      // Show notification
+      setTimeout(() => notification.classList.add('show'), 100);
+      
+      // Hide notification after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
     }
 
     // ====== Render Hero / Popular / Menu / Locations ======
@@ -869,6 +918,15 @@
         const card = document.createElement('div');
         card.className = 'min-w-[220px] border bg-white rounded-2xl p-4';
         card.innerHTML = `
+          <div class="aspect-[4/3] rounded-lg mb-3 bg-gradient-to-br from-amber-100 to-amber-200 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                 alt="French Tacos ${it.name}" 
+                 class="w-full h-full object-cover"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+            <div class="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center text-amber-800 font-bold text-xl" style="display: none;">
+              🌮
+            </div>
+          </div>
           <div class="text-sm text-slate-500 mb-1">French Tacos</div>
           <div class="font-semibold">${it.name}</div>
           <div class="mt-2 flex gap-2 flex-wrap text-xs">${Object.entries(it.prices||{}).map(([k,v])=>`<span class='px-2 py-1 bg-slate-100 rounded-full border'>${k}: ${money(v)}</span>`).join('')}</div>
@@ -928,6 +986,43 @@
     function renderItemCard(item, section){
       const card = document.createElement('div');
       card.className = 'border rounded-2xl p-4 bg-white';
+      
+      // Get appropriate image based on section
+      let imageUrl = '';
+      let fallbackEmoji = '🍽️';
+      
+      if (section.name.toLowerCase().includes('tacos')) {
+        imageUrl = 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
+        fallbackEmoji = '🌮';
+      } else if (section.name.toLowerCase().includes('burger')) {
+        imageUrl = 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
+        fallbackEmoji = '🍔';
+      } else if (section.name.toLowerCase().includes('salade')) {
+        imageUrl = 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
+        fallbackEmoji = '🥗';
+      } else if (section.name.toLowerCase().includes('panini')) {
+        imageUrl = 'https://images.unsplash.com/photo-1509722747041-616f39b57569?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
+        fallbackEmoji = '🥪';
+      } else if (section.name.toLowerCase().includes('dessert')) {
+        imageUrl = 'https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
+        fallbackEmoji = '🍰';
+      } else if (section.name.toLowerCase().includes('boisson')) {
+        imageUrl = 'https://images.unsplash.com/photo-1544145945-f90425340c7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
+        fallbackEmoji = '🥤';
+      }
+      
+      const imageContainer = document.createElement('div');
+      imageContainer.className = 'aspect-[4/3] rounded-lg mb-3 bg-gradient-to-br from-amber-100 to-amber-200 overflow-hidden';
+      imageContainer.innerHTML = `
+        <img src="${imageUrl}" 
+             alt="${item.name}" 
+             class="w-full h-full object-cover"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+        <div class="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center text-amber-800 font-bold text-xl" style="display: none;">
+          ${fallbackEmoji}
+        </div>
+      `;
+      
       const title = document.createElement('div');
       title.className = 'font-semibold';
       title.textContent = item.name;
@@ -951,7 +1046,7 @@
       addBtn.onclick = () => openAddToCart(item, section);
       ctas.appendChild(addBtn);
       
-      card.append(title, desc, price, ctas);
+      card.append(imageContainer, title, desc, price, ctas);
       return card;
     }
 
